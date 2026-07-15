@@ -20,10 +20,15 @@ def load_rows():
         return list(csv.DictReader(f))
 
 
+CITY_KEEP_DISTRICTS = {"고양시"}  # 이 시는 구 단위로 세분화해서 보여준다
+
+
 def city_of(sigungu: str) -> str:
-    """고양시 덕양구 -> 고양시 처럼, 구가 딸린 시는 시 단위로 묶는다."""
+    """고양시 덕양구 -> 고양시 처럼, 구가 딸린 시는 시 단위로 묶는다. (단, CITY_KEEP_DISTRICTS는 구 유지)"""
     parts = sigungu.split()
     if len(parts) >= 2 and parts[0].endswith("시") and parts[1].endswith("구"):
+        if parts[0] in CITY_KEEP_DISTRICTS:
+            return sigungu
         return parts[0]
     return sigungu
 
