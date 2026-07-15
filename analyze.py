@@ -70,15 +70,10 @@ def compute_frequency(rows):
     return entries, total
 
 
-def compute_intervals(rows):
-    rounds_by_region = defaultdict(set)
-    for row in rows:
-        rounds_by_region[row["sido"]].add(int(row["round"]))
-
-    latest_round = max(int(row["round"]) for row in rows)
-
+def _interval_entries(rounds_by_key, latest_round):
+    """{key: set(rounds)} -> 간격 통계 entry 목록 (가장 '밀린' 순으로 정렬)."""
     entries = []
-    for region, round_set in rounds_by_region.items():
+    for key, round_set in rounds_by_key.items():
         appearances = sorted(round_set)
         if len(appearances) < 2:
             avg_gap = None
@@ -96,7 +91,7 @@ def compute_intervals(rows):
             expected_date = None
             overdue = False
         entries.append({
-            "region": region,
+            "name": key,
             "appearances": len(appearances),
             "avg_gap": avg_gap,
             "last_round": last_round,
@@ -105,8 +100,35 @@ def compute_intervals(rows):
             "expected_date": expected_date,
             "overdue": overdue,
         })
-
     entries.sort(key=lambda e: (e["since_last"] - (e["avg_gap"] or 0)), reverse=True)
+    return entries
+
+
+def compute_intervals(rows):
+    sido_rounds = defaultdict(set)
+    city_rounds = defaultdict(lambda: defaultdict(set))  # [sido][city]
+    district_rounds = defaultdict(lambda: defaultdict(lambda: defaultdict(set)))  # [sido][city][district]
+
+    for row in rows:
+        sido, sigungu, rnd = row["sido"], row["sigungu"], int(row["round"])
+        city = city_of(sigungu)
+        sido_rounds[sido].add(rnd)
+        city_rounds[sido][city].add(rnd)
+        if city != sigungu:
+            district_rounds[sido][city][sigungu].add(rnd)
+
+    latest_round = max(int(row["round"]) for row in rows)
+
+    entries = _interval_entries(sido_rounds, latest_round)
+    for e in entries:
+        sido = e["name"]
+        e["region"] = sido  # 텍스트 리포트 호환용
+        cities = _interval_entries(city_rounds[sido], latest_round)
+        for ce in cities:
+            districts = district_rounds[sido].get(ce["name"])
+            ce["districts"] = _interval_entries(districts, latest_round) if districts else None
+        e["cities"] = cities
+
     return entries, latest_round
 
 
@@ -183,13 +205,42 @@ def render_html(freq_entries, total, interval_entries, latest_round, generated_a
         for e in freq_entries
     )
 
+    def interval_row(name_cell, e):
+        avg_gap_str = f"{e['avg_gap']:.1f}회" if e["avg_gap"] else "N/A"
+        expect_str = f"{e['expected_round']}회 ({e['expected_date']})" if e["expected_round"] else "데이터 부족"
+        tag = ' <span class="tag">지남</span>' if e["overdue"] else ""
+        return f"""<tr class="{'overdue' if e['overdue'] else ''}">
+          <td>{name_cell}</td><td>{e['appearances']}</td>
+          <td>{avg_gap_str}</td><td>{e['last_round']}회</td><td>{e['since_last']}회</td>
+          <td>{expect_str}{tag}</td>
+        </tr>"""
+
+    def interval_table(rows_html):
+        return f"""<table class="city-table">
+          <tr><th>지역</th><th>등장</th><th>평균간격</th><th>마지막</th><th>경과</th><th>다음 예상</th></tr>
+          {rows_html}
+        </table>"""
+
+    def interval_city_name_cell(c):
+        if not c["districts"]:
+            return c["name"]
+        district_rows = "\n".join(
+            interval_row(d["name"].removeprefix(c["name"] + " "), d) for d in c["districts"]
+        )
+        return f"""<details class="nested">
+          <summary>{c['name']} (구별 보기)</summary>
+          {interval_table(district_rows)}
+        </details>"""
+
     interval_rows = "\n".join(
-        f"""<tr class="{'overdue' if e['overdue'] else ''}">
-          <td>{e['region']}</td><td>{e['appearances']}</td>
-          <td>{f"{e['avg_gap']:.1f}회" if e['avg_gap'] else 'N/A'}</td>
-          <td>{e['last_round']}회</td><td>{e['since_last']}회</td>
-          <td>{f"{e['expected_round']}회 ({e['expected_date']})" if e['expected_round'] else '데이터 부족'}
-              {' <span class="tag">지남</span>' if e['overdue'] else ''}</td>
+        f"""{interval_row(e['region'], e)}
+        <tr class="detail-row">
+          <td colspan="6">
+            <details>
+              <summary>시/군/구별 세부 보기</summary>
+              {interval_table(chr(10).join(interval_row(interval_city_name_cell(c), c) for c in e['cities']))}
+            </details>
+          </td>
         </tr>"""
         for e in interval_entries
     )
