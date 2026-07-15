@@ -20,11 +20,13 @@
   details summary { cursor: pointer; color: #4f7cff; font-size: 0.85rem; }
   table.city-table { margin-top: 8px; font-size: 0.85rem; }
   table.city-table th, table.city-table td { padding: 4px 8px; }
+  details.nested summary { font-size: 0.85rem; color: #333; }
+  details.nested table.city-table { margin-left: 12px; width: calc(100% - 12px); }
 </style>
 </head>
 <body>
   <h1>로또6/45 1등 당첨점포 지역 통계</h1>
-  <p class="meta">기준 회차: 1232회 (2026-07-11) · 생성 시각: 2026-07-15 12:32</p>
+  <p class="meta">기준 회차: 1232회 (2026-07-11) · 생성 시각: 2026-07-15 12:37</p>
 
   <h2>시/도별 1등 배출 빈도</h2>
   <table>
@@ -40,31 +42,76 @@
               <summary>시/군/구별 세부 보기</summary>
               <table class="city-table">
           <tr><th>시/군/구</th><th>당첨건수</th></tr>
-          <tr><td>수원시</td><td>57</td></tr>
-<tr><td>안산시</td><td>47</td></tr>
+          <tr><td><details class="nested">
+          <summary>수원시 (구별 보기)</summary>
+          <table class="city-table">
+            <tr><th>구</th><th>당첨건수</th></tr>
+            <tr><td>권선구</td><td>17</td></tr>
+<tr><td>장안구</td><td>14</td></tr>
+<tr><td>팔달구</td><td>14</td></tr>
+<tr><td>영통구</td><td>12</td></tr>
+          </table>
+        </details></td><td>57</td></tr>
+<tr><td><details class="nested">
+          <summary>안산시 (구별 보기)</summary>
+          <table class="city-table">
+            <tr><th>구</th><th>당첨건수</th></tr>
+            <tr><td>단원구</td><td>32</td></tr>
+<tr><td>상록구</td><td>15</td></tr>
+          </table>
+        </details></td><td>47</td></tr>
+<tr><td><details class="nested">
+          <summary>고양시 (구별 보기)</summary>
+          <table class="city-table">
+            <tr><th>구</th><th>당첨건수</th></tr>
+            <tr><td>덕양구</td><td>21</td></tr>
+<tr><td>일산서구</td><td>14</td></tr>
+<tr><td>일산동구</td><td>12</td></tr>
+          </table>
+        </details></td><td>47</td></tr>
 <tr><td>시흥시</td><td>46</td></tr>
 <tr><td>화성시</td><td>44</td></tr>
 <tr><td>부천시</td><td>39</td></tr>
-<tr><td>성남시</td><td>38</td></tr>
+<tr><td><details class="nested">
+          <summary>성남시 (구별 보기)</summary>
+          <table class="city-table">
+            <tr><th>구</th><th>당첨건수</th></tr>
+            <tr><td>분당구</td><td>17</td></tr>
+<tr><td>중원구</td><td>16</td></tr>
+<tr><td>수정구</td><td>5</td></tr>
+          </table>
+        </details></td><td>38</td></tr>
 <tr><td>남양주시</td><td>38</td></tr>
 <tr><td>의정부시</td><td>38</td></tr>
-<tr><td>용인시</td><td>37</td></tr>
+<tr><td><details class="nested">
+          <summary>용인시 (구별 보기)</summary>
+          <table class="city-table">
+            <tr><th>구</th><th>당첨건수</th></tr>
+            <tr><td>기흥구</td><td>16</td></tr>
+<tr><td>처인구</td><td>12</td></tr>
+<tr><td>수지구</td><td>9</td></tr>
+          </table>
+        </details></td><td>37</td></tr>
 <tr><td>파주시</td><td>31</td></tr>
 <tr><td>평택시</td><td>31</td></tr>
 <tr><td>김포시</td><td>29</td></tr>
 <tr><td>안성시</td><td>23</td></tr>
-<tr><td>고양시 덕양구</td><td>21</td></tr>
-<tr><td>안양시</td><td>18</td></tr>
+<tr><td><details class="nested">
+          <summary>안양시 (구별 보기)</summary>
+          <table class="city-table">
+            <tr><th>구</th><th>당첨건수</th></tr>
+            <tr><td>동안구</td><td>10</td></tr>
+<tr><td>만안구</td><td>8</td></tr>
+          </table>
+        </details></td><td>18</td></tr>
 <tr><td>광주시</td><td>16</td></tr>
 <tr><td>양주시</td><td>15</td></tr>
 <tr><td>오산시</td><td>15</td></tr>
-<tr><td>고양시 일산서구</td><td>14</td></tr>
 <tr><td>군포시</td><td>13</td></tr>
 <tr><td>광명시</td><td>13</td></tr>
 <tr><td>여주시</td><td>13</td></tr>
 <tr><td>포천시</td><td>12</td></tr>
 <tr><td>구리시</td><td>12</td></tr>
-<tr><td>고양시 일산동구</td><td>12</td></tr>
 <tr><td>하남시</td><td>11</td></tr>
 <tr><td>이천시</td><td>9</td></tr>
 <tr><td>양평군</td><td>6</td></tr>
@@ -183,7 +230,17 @@
               <summary>시/군/구별 세부 보기</summary>
               <table class="city-table">
           <tr><th>시/군/구</th><th>당첨건수</th></tr>
-          <tr><td>창원시</td><td>46</td></tr>
+          <tr><td><details class="nested">
+          <summary>창원시 (구별 보기)</summary>
+          <table class="city-table">
+            <tr><th>구</th><th>당첨건수</th></tr>
+            <tr><td>의창구</td><td>11</td></tr>
+<tr><td>진해구</td><td>10</td></tr>
+<tr><td>마산회원구</td><td>10</td></tr>
+<tr><td>마산합포구</td><td>9</td></tr>
+<tr><td>성산구</td><td>6</td></tr>
+          </table>
+        </details></td><td>46</td></tr>
 <tr><td>김해시</td><td>33</td></tr>
 <tr><td>양산시</td><td>23</td></tr>
 <tr><td>진주시</td><td>17</td></tr>
@@ -215,7 +272,14 @@
               <summary>시/군/구별 세부 보기</summary>
               <table class="city-table">
           <tr><th>시/군/구</th><th>당첨건수</th></tr>
-          <tr><td>천안시</td><td>44</td></tr>
+          <tr><td><details class="nested">
+          <summary>천안시 (구별 보기)</summary>
+          <table class="city-table">
+            <tr><th>구</th><th>당첨건수</th></tr>
+            <tr><td>서북구</td><td>25</td></tr>
+<tr><td>동남구</td><td>19</td></tr>
+          </table>
+        </details></td><td>44</td></tr>
 <tr><td>아산시</td><td>39</td></tr>
 <tr><td>당진시</td><td>11</td></tr>
 <tr><td>예산군</td><td>8</td></tr>
@@ -243,7 +307,14 @@
               <summary>시/군/구별 세부 보기</summary>
               <table class="city-table">
           <tr><th>시/군/구</th><th>당첨건수</th></tr>
-          <tr><td>포항시</td><td>27</td></tr>
+          <tr><td><details class="nested">
+          <summary>포항시 (구별 보기)</summary>
+          <table class="city-table">
+            <tr><th>구</th><th>당첨건수</th></tr>
+            <tr><td>북구</td><td>22</td></tr>
+<tr><td>남구</td><td>5</td></tr>
+          </table>
+        </details></td><td>27</td></tr>
 <tr><td>구미시</td><td>22</td></tr>
 <tr><td>칠곡군</td><td>14</td></tr>
 <tr><td>경주시</td><td>14</td></tr>
@@ -308,7 +379,16 @@
               <summary>시/군/구별 세부 보기</summary>
               <table class="city-table">
           <tr><th>시/군/구</th><th>당첨건수</th></tr>
-          <tr><td>청주시</td><td>54</td></tr>
+          <tr><td><details class="nested">
+          <summary>청주시 (구별 보기)</summary>
+          <table class="city-table">
+            <tr><th>구</th><th>당첨건수</th></tr>
+            <tr><td>흥덕구</td><td>20</td></tr>
+<tr><td>상당구</td><td>17</td></tr>
+<tr><td>청원구</td><td>12</td></tr>
+<tr><td>서원구</td><td>5</td></tr>
+          </table>
+        </details></td><td>54</td></tr>
 <tr><td>충주시</td><td>9</td></tr>
 <tr><td>옥천군</td><td>9</td></tr>
 <tr><td>음성군</td><td>8</td></tr>
@@ -386,7 +466,14 @@
               <summary>시/군/구별 세부 보기</summary>
               <table class="city-table">
           <tr><th>시/군/구</th><th>당첨건수</th></tr>
-          <tr><td>전주시</td><td>35</td></tr>
+          <tr><td><details class="nested">
+          <summary>전주시 (구별 보기)</summary>
+          <table class="city-table">
+            <tr><th>구</th><th>당첨건수</th></tr>
+            <tr><td>완산구</td><td>21</td></tr>
+<tr><td>덕진구</td><td>14</td></tr>
+          </table>
+        </details></td><td>35</td></tr>
 <tr><td>군산시</td><td>16</td></tr>
 <tr><td>익산시</td><td>15</td></tr>
 <tr><td>정읍시</td><td>7</td></tr>

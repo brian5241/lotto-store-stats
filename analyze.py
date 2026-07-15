@@ -20,15 +20,10 @@ def load_rows():
         return list(csv.DictReader(f))
 
 
-CITY_KEEP_DISTRICTS = {"고양시"}  # 이 시는 구 단위로 세분화해서 보여준다
-
-
 def city_of(sigungu: str) -> str:
-    """고양시 덕양구 -> 고양시 처럼, 구가 딸린 시는 시 단위로 묶는다. (단, CITY_KEEP_DISTRICTS는 구 유지)"""
+    """고양시 덕양구 -> 고양시 처럼, 구가 딸린 시는 시 단위로 묶는다."""
     parts = sigungu.split()
     if len(parts) >= 2 and parts[0].endswith("시") and parts[1].endswith("구"):
-        if parts[0] in CITY_KEEP_DISTRICTS:
-            return sigungu
         return parts[0]
     return sigungu
 
@@ -37,10 +32,15 @@ def compute_frequency(rows):
     wins = defaultdict(int)
     stores = defaultdict(set)
     city_wins = defaultdict(lambda: defaultdict(int))
+    district_wins = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))  # [region][city][district]
     for row in rows:
-        wins[row["sido"]] += 1
-        stores[row["sido"]].add(row["ltShpId"])
-        city_wins[row["sido"]][city_of(row["sigungu"])] += 1
+        region, sigungu = row["sido"], row["sigungu"]
+        city = city_of(sigungu)
+        wins[region] += 1
+        stores[region].add(row["ltShpId"])
+        city_wins[region][city] += 1
+        if city != sigungu:  # "고양시 덕양구"처럼 구가 딸린 경우만 세부 데이터로 기록
+            district_wins[region][city][sigungu] += 1
 
     total = sum(wins.values())
     ranked = sorted(wins.items(), key=lambda x: x[1], reverse=True)
@@ -48,13 +48,24 @@ def compute_frequency(rows):
     entries = []
     for i, (region, count) in enumerate(ranked, 1):
         cities = sorted(city_wins[region].items(), key=lambda x: x[1], reverse=True)
+        city_entries = []
+        for name, c in cities:
+            districts = district_wins[region].get(name)
+            city_entries.append({
+                "name": name,
+                "count": c,
+                "districts": (
+                    [{"name": d, "count": dc} for d, dc in sorted(districts.items(), key=lambda x: x[1], reverse=True)]
+                    if districts else None
+                ),
+            })
         entries.append({
             "rank": i,
             "region": region,
             "count": count,
             "stores": len(stores[region]),
             "pct": count / total * 100,
-            "cities": [{"name": name, "count": c} for name, c in cities],
+            "cities": city_entries,
         })
     return entries, total
 
@@ -131,9 +142,24 @@ def render_interval_text(entries, latest_round):
 
 
 def render_html(freq_entries, total, interval_entries, latest_round, generated_at):
+    def city_name_cell(c):
+        if not c["districts"]:
+            return c["name"]
+        district_rows = "\n".join(
+            f"<tr><td>{d['name'].removeprefix(c['name'] + ' ')}</td><td>{d['count']}</td></tr>"
+            for d in c["districts"]
+        )
+        return f"""<details class="nested">
+          <summary>{c['name']} (구별 보기)</summary>
+          <table class="city-table">
+            <tr><th>구</th><th>당첨건수</th></tr>
+            {district_rows}
+          </table>
+        </details>"""
+
     def city_table(cities):
         city_rows = "\n".join(
-            f"<tr><td>{c['name']}</td><td>{c['count']}</td></tr>" for c in cities
+            f"<tr><td>{city_name_cell(c)}</td><td>{c['count']}</td></tr>" for c in cities
         )
         return f"""<table class="city-table">
           <tr><th>시/군/구</th><th>당첨건수</th></tr>
@@ -190,6 +216,8 @@ def render_html(freq_entries, total, interval_entries, latest_round, generated_a
   details summary {{ cursor: pointer; color: #4f7cff; font-size: 0.85rem; }}
   table.city-table {{ margin-top: 8px; font-size: 0.85rem; }}
   table.city-table th, table.city-table td {{ padding: 4px 8px; }}
+  details.nested summary {{ font-size: 0.85rem; color: #333; }}
+  details.nested table.city-table {{ margin-left: 12px; width: calc(100% - 12px); }}
 </style>
 </head>
 <body>
